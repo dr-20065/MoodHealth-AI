@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Sign in · HealthMood{% endblock %}
+{% block content %}
+<section class="auth-layout">
+  <div class="auth-intro">
+    <a class="brand" href="{{ url_for('login') }}"><span class="brand-mark">✦</span> HealthMood</a>
+    <p class="eyebrow">Your everyday wellbeing space</p>
+    <h1>Notice the small things that shape how you feel.</h1>
+    <p class="lead">Track your mood, sleep, energy, movement, and reflections in one calm, private place.</p>
+    <div class="privacy-note">🔒 Your check-ins are visible only to you.</div>
+  </div>
+  <div class="auth-card">
+    <p class="eyebrow">Welcome back</p>
+    <h2>Sign in to HealthMood</h2>
+
+    <a href="{{ url_for('demo_login') }}" class="button demo-button">✨ Explore Live Demo (Instant Access)</a>
+    <div class="demo-helper">
+      <small>Preloaded with 30 days of health data, analytics, and journal reflections.</small>
+    </div>
+
+    <div class="demo-card-divider">
+      <span>or sign in with email</span>
+    </div>
+
+    <form method="post" class="form-stack"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>Email <input type="email" name="email" autocomplete="email" required autofocus placeholder="name@example.com"></label>
+      <label>Password <input type="password" name="password" autocomplete="current-password" required placeholder="••••••••"></label>
+      <label class="checkbox-label"><input type="checkbox" name="remember"> Keep me signed in</label>
+      <button class="button primary" type="submit">Sign in</button>
+    </form>
+    <p class="form-footer">New here? <a href="{{ url_for('register') }}">Create your account</a></p>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Journal · HealthMood{% endblock %}
+{% block content %}
+<section class="page-heading compact-heading">
+  <div><p class="eyebrow">Daily health journal</p><h1>Put today into words.</h1><p>Your private space to capture feelings, moments, and what supported you.</p></div>
+</section>
+<div class="journal-layout">
+  <section class="journal-compose panel">
+    <p class="eyebrow">New entry</p><h2>Write a reflection</h2>
+    <form method="post" class="form-stack"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>Date <input type="date" name="entry_date" value="{{ today.isoformat() }}" max="{{ today.isoformat() }}" required></label>
+      <label>Title <input type="text" name="title" maxlength="160" placeholder="Give this day a name" required></label>
+      <label>Your note <textarea name="body" rows="10" placeholder="What’s on your mind? What affected how you felt today?" required></textarea></label>
+      <button class="button primary" type="submit">Save journal entry <span>→</span></button>
+    </form>
+  </section>
+  <section class="journal-entries">
+    <div class="section-title"><div><p class="eyebrow">Your reflections</p><h2>Past entries</h2></div><span class="count-badge">{{ entries|length }}</span></div>
+    {% if entries %}
+      <div class="entry-list">
+      {% for entry in entries %}
+        <article class="journal-entry panel">
+          <div class="entry-date"><span>{{ entry.entry_date.strftime('%d') }}</span>{{ entry.entry_date.strftime('%b') }}</div>
+          <div class="entry-content"><p class="eyebrow">{{ entry.entry_date.strftime('%A, %Y') }}</p><h3>{{ entry.title }}</h3><p>{{ entry.body }}</p><div class="entry-actions"><a href="{{ url_for('edit_journal', entry_id=entry.id) }}">Edit</a><form action="{{ url_for('delete_journal', entry_id=entry.id) }}" method="post" data-confirm="Delete this journal entry? This cannot be undone."><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button type="submit">Delete</button></form></div></div>
+        </article>
+      {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state panel"><span>✎</span><h3>Your reflections will live here.</h3><p>Write the first entry whenever you’re ready.</p></div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

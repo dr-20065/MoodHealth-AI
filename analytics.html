@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Insights · HealthMood{% endblock %}
+{% block content %}
+<section class="page-heading compact-heading"><div><p class="eyebrow">Your health analytics</p><h1>Notice your patterns.</h1><p>These are gentle signals from the check-ins you choose to record.</p></div><a class="button secondary" href="{{ url_for('track') }}">Add a check-in</a></section>
+<section class="stat-grid">
+  <article class="stat-card"><span>◫</span><p>Check-ins</p><strong>{{ summary.days }}</strong><small>in the past 30 days</small></article>
+  <article class="stat-card"><span>☾</span><p>Average sleep</p><strong>{{ summary.sleep }}h</strong><small>per logged day</small></article>
+  <article class="stat-card"><span>◒</span><p>Average water</p><strong>{{ summary.water }}</strong><small>glasses per logged day</small></article>
+  <article class="stat-card"><span>↯</span><p>Average energy</p><strong>{{ summary.energy }}/5</strong><small>per logged day</small></article>
+</section>
+{% if summary.days == 0 %}
+<section class="insight-callout" style="background:#fdf9ed; border-color:#f6e8c3; margin-bottom:24px;">
+  <div class="callout-icon" style="color:#b8860b;">✦</div>
+  <div>
+    <p class="eyebrow" style="color:#b8860b;">No check-ins recorded yet</p>
+    <h2>Preview your analytics in action</h2>
+    <p>You haven't logged any days yet. Want to see what 30 days of trends and insights look like?</p>
+    <form action="{{ url_for('load_sample_data') }}" method="post" style="margin-top:10px;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button type="submit" class="button primary small-btn">⚡ Populate 30 days of sample data</button>
+    </form>
+  </div>
+</section>
+{% endif %}
+<section class="charts-grid">
+  <article class="panel chart-panel"><div class="section-title"><div><p class="eyebrow">Mood & energy</p><h2>How your days have felt</h2></div><span class="legend"><i class="dot purple"></i>Mood <i class="dot coral"></i>Energy</span></div>
+    <div class="native-chart" role="img" aria-label="Mood and energy trend over the last 30 days">
+    {% for row in chart_rows %}<div class="chart-column" title="{{ row.date }}: mood {{ row.mood }}/5, energy {{ row.energy }}/5"><div class="bar-pair"><i class="bar mood-bar" style="height: {{ row.mood * 18 }}px"></i><i class="bar energy-bar" style="height: {{ row.energy * 18 }}px"></i></div><span>{{ row.label }}</span></div>{% endfor %}
+    </div>
+    <p class="chart-note">Mood is a visual guide: Happy 5, Normal 4, Sad 2, Angry/Stressed 1.</p>
+  </article>
+  <article class="panel chart-panel"><div class="section-title"><div><p class="eyebrow">Rest & hydration</p><h2>Daily foundations</h2></div><span class="legend"><i class="dot blue"></i>Sleep <i class="dot aqua"></i>Water</span></div>
+    <div class="native-chart" role="img" aria-label="Sleep and water trend over the last 30 days">
+    {% for row in chart_rows %}<div class="chart-column" title="{{ row.date }}: {{ row.sleep }} hours sleep, {{ row.water }} glasses water"><div class="bar-pair"><i class="bar sleep-bar" style="height: {{ row.sleep * 11 }}px"></i><i class="bar water-bar" style="height: {{ row.water * 11 }}px"></i></div><span>{{ row.label }}</span></div>{% endfor %}
+    </div>
+    <p class="chart-note">Bar heights are capped visually at 10 hours or glasses.</p>
+  </article>
+</section>
+<section class="insight-callout"><div class="callout-icon">✦</div><div><p class="eyebrow">Wellness notes</p><h2>Based on your recent check-ins</h2><div class="insight-notes">{% for suggestion in suggestions %}<p>{{ suggestion }}</p>{% endfor %}</div></div></section>
+<p class="disclaimer analytics-disclaimer">This page helps you observe wellbeing patterns. It does not provide medical advice, diagnosis, or treatment. If you are worried about your health, consult a qualified healthcare professional.</p>
+{% endblock %}

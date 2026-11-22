@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Overview · HealthMood{% endblock %}
+{% block content %}
+<section class="page-heading dashboard-heading">
+  <div>
+    <p class="eyebrow">{{ now.strftime('%A, %B %-d') if now is defined else 'Your wellbeing overview' }}</p>
+    <h1>Hello, {{ current_user.name.split(' ')[0] }}.</h1>
+    <p>How are you doing today? A one-minute check-in is enough.</p>
+  </div>
+  <a class="button primary" href="{{ url_for('track') }}">{% if today_log %}Update today’s check-in{% else %}Check in today{% endif %} <span>→</span></a>
+</section>
+
+{% if today_log %}
+<section class="today-card">
+  <div class="today-mood"><span class="mood-icon">{{ mood_icons[today_log.mood] }}</span><div><p class="eyebrow">Today’s check-in</p><h2>{{ today_log.mood }}</h2></div></div>
+  <div class="today-metrics">
+    <div><span>Sleep</span><strong>{{ today_log.sleep_hours|round(1) }}h</strong></div>
+    <div><span>Water</span><strong>{{ today_log.water_glasses }} glasses</strong></div>
+    <div><span>Energy</span><strong>{{ today_log.energy_level }}/5</strong></div>
+    <div><span>Movement</span><strong>{{ today_log.exercise_minutes }} min</strong></div>
+  </div>
+</section>
+{% else %}
+<section class="empty-checkin">
+  <div class="empty-illustration">✦</div>
+  <div><p class="eyebrow">No check-in yet</p><h2>Make space for how you feel.</h2><p>Record your mood and a few physical signals to build your personal picture over time.</p></div>
+  <div style="display:flex; gap:10px; margin-left:auto; align-items:center; flex-wrap:wrap;">
+    <a class="text-link" href="{{ url_for('track') }}">Start a check-in →</a>
+    <form action="{{ url_for('load_sample_data') }}" method="post" style="margin:0;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button type="submit" class="button secondary small-btn">⚡ Load sample data</button>
+    </form>
+  </div>
+</section>
+{% endif %}
+
+<section class="dashboard-grid">
+  <article class="panel recent-panel">
+    <div class="section-title"><div><p class="eyebrow">Last 7 check-ins</p><h2>Your recent rhythm</h2></div><a href="{{ url_for('analytics') }}">View insights →</a></div>
+    {% if recent_logs %}
+    <div class="checkin-list">
+      {% for log in recent_logs %}
+      <div class="checkin-row">
+        <span class="mood-dot mood-{{ log.mood|lower }}">{{ mood_icons[log.mood] }}</span>
+        <div><strong>{{ log.log_date.strftime('%A') }}</strong><span>{{ log.log_date.strftime('%b %d') }}</span></div>
+        <div class="row-mood">{{ log.mood }}</div>
+        <div class="row-stat">{{ log.sleep_hours|round(1) }}h <span>sleep</span></div>
+        <div class="row-stat">{{ log.energy_level }}/5 <span>energy</span></div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="muted">Your recent check-ins will appear here.</p>
+    {% endif %}
+  </article>
+
+  <aside class="panel suggestions-panel" id="wellness-notes">
+    <p class="eyebrow">Gentle observation</p>
+    <h2>Wellness notes</h2>
+    <div class="suggestion-list">
+      {% for suggestion in suggestions %}
+      <div class="suggestion"><span>✦</span><p>{{ suggestion }}</p></div>
+      {% endfor %}
+    </div>
+    <p class="disclaimer">HealthMood offers general wellbeing observations, not medical advice or diagnosis.</p>
+  </aside>
+</section>
+
+<section class="module-grid" aria-label="HealthMood modules">
+  <a class="module-card tone-lilac" href="{{ url_for('dashboard') }}"><span>◉</span><div><h3>Private dashboard</h3><p>Your personal wellbeing space</p></div><b>→</b></a>
+  <a class="module-card tone-peach" href="{{ url_for('track') }}"><span>☼</span><div><h3>Mood tracking</h3><p>Notice and name how you feel</p></div><b>→</b></a>
+  <a class="module-card tone-mint" href="{{ url_for('track') }}"><span>↯</span><div><h3>Physical health</h3><p>Sleep, water, energy & movement</p></div><b>→</b></a>
+  <a class="module-card tone-lilac" href="{{ url_for('journal') }}"><span>✎</span><div><h3>Health journal</h3><p>Write and revisit reflections</p></div><b>→</b></a>
+  <a class="module-card tone-peach" href="{{ url_for('analytics') }}"><span>⌁</span><div><h3>Health analytics</h3><p>See your patterns over time</p></div><b>→</b></a>
+  <a class="module-card tone-mint" href="#wellness-notes"><span>✦</span><div><h3>Wellness notes</h3><p>General habits-based observations</p></div><b>↓</b></a>
+</section>
+{% endblock %}
